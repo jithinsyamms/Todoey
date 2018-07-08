@@ -10,15 +10,24 @@ import UIKit
 
 class TodoListViewController: UITableViewController {
 
-    var itemArray:[String] = ["Find Mike", "Buy Eggs", "Destroy Avengers"];
     var defaults = UserDefaults.standard
+    var itemArray = [Item]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        if let items = defaults.array(forKey: "ToDoListArray") as? [String]{
-            itemArray = items
-        }
-        // Do any additional setup after loading the view, typically from a nib.
+        
+        var item = Item()
+        item.title = "Find Mike"
+        itemArray.append(item)
+        
+        item = Item()
+        item.title = "Buy Eggs"
+        itemArray.append(item)
+        
+        item = Item()
+        item.title = "Destroy Avengers"
+        itemArray.append(item)
+        
     }
 
     //MARK - Tableview Datasource methods
@@ -29,19 +38,17 @@ class TodoListViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "TodoItemCell", for: indexPath)
-        cell.textLabel?.text = itemArray[indexPath.row]
+        let item = itemArray[indexPath.row]
+        cell.textLabel?.text = item.title
+        cell.accessoryType = item.done ? .checkmark : .none
         return cell
     }
     
     //MARK - Tableview Delegate methods
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if tableView.cellForRow(at: indexPath)?.accessoryType ==  .checkmark {
-            tableView.cellForRow(at: indexPath)?.accessoryType = .none
-        }
-        else{
-            tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
-        }
+        itemArray[indexPath.row].done = !itemArray[indexPath.row].done
+        tableView.reloadData()
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
@@ -51,9 +58,8 @@ class TodoListViewController: UITableViewController {
         var textField = UITextField()
         let alertController = UIAlertController(title: "Add New Todo Item", message: "", preferredStyle: .alert)
         let action = UIAlertAction(title: "Add item", style: .default) { (action) in
-            self.itemArray.append(textField.text!)
-            self.defaults.set(self.itemArray, forKey: "ToDoListArray")
-            
+//            self.itemArray.append(textField.text!)
+//            self.defaults.set(self.itemArray, forKey: "ToDoListArray")
             self.tableView.reloadData()
         }
         alertController.addTextField { (alertTextField) in
